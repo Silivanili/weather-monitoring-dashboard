@@ -40,9 +40,25 @@ Dependencies will be added as the application is developed.
 
 ## Usage
 
-The application is currently in the initial project setup phase.
+## Usage
 
-A runnable application and usage commands will be added in the next development steps.
+Activate the virtual environment:
+
+```bash
+source .venv/bin/activate
+```
+
+Run the application:
+
+```bash
+python3 app/main.py
+```
+
+Expected output:
+
+```text
+Weather Monitoring Dashboard
+```
 
 ## Project Status
 
