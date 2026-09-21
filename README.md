@@ -36,3 +36,14 @@ Clone the repository:
 git clone git@github.com:Silivanili/weather-monitoring-dashboard.git
 cd weather-monitoring-dashboard
 
+Dependencies will be added as the application is developed.
+
+## Usage
+
+The application is currently in the initial project setup phase.
+
+A runnable application and usage commands will be added in the next development steps.
+
+## Project Status
+
+Week 2: Git repository and project documentation setup.
