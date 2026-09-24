@@ -1,7 +1,10 @@
-def main():
-    print("Weather Monitoring Dashboard")
+from fastapi import FastAPI
 
+from app.api.weather import router as weather_router
 
-if __name__ == "__main__":
-    main()
+app = FastAPI(
+    title="Weather Monitoring Dashboard",
+    version="0.1.0",
+)
 
+app.include_router(weather_router)
