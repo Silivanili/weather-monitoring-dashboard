@@ -63,3 +63,11 @@ ruff format --check .
 ## Project Status
 
 Week 3: FastAPI foundation, weather API integration and automated tests.
+
+## Development Workflow
+
+This project follows **GitHub Flow**. Development takes place on short-lived
+feature or fix branches and changes are merged into `main` through Pull Requests.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete branching and contribution
+rules.
