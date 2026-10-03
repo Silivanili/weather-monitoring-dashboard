@@ -2,8 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.schemas.weather import WeatherResponse
-from app.services.weather import WeatherProviderError, get_weather_data
+from app.schemas.weather import ForecastResponse, WeatherResponse
+from app.services.weather import (
+    WeatherProviderError,
+    get_forecast_data,
+    get_weather_data,
+)
 from app.services.weather_storage import (
     get_latest_weather_observation,
     is_weather_observation_fresh,
@@ -49,6 +53,24 @@ def get_weather(
                 stale=True,
             )
 
+        raise HTTPException(
+            status_code=502,
+            detail="Weather provider unavailable",
+        ) from exc
+
+
+@router.get(
+    "/weather/forecast",
+    response_model=ForecastResponse,
+)
+def get_forecast(
+    latitude: float = Query(..., ge=-90, le=90),
+    longitude: float = Query(..., ge=-180, le=180),
+):
+    try:
+        return get_forecast_data(latitude, longitude)
+
+    except WeatherProviderError as exc:
         raise HTTPException(
             status_code=502,
             detail="Weather provider unavailable",
