@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.locations import router as locations_router
 from app.api.weather import router as weather_router
 from app.db.database import Base, engine
 
@@ -17,3 +18,4 @@ def get_health():
 
 
 app.include_router(weather_router)
+app.include_router(locations_router)
