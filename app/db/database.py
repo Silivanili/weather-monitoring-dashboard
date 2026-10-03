@@ -32,3 +32,17 @@ class Base(DeclarativeBase):
 def get_db():
     with SessionLocal() as db:
         yield db
+
+
+def check_database_connection() -> bool:
+    from sqlalchemy import text
+    from sqlalchemy.exc import SQLAlchemyError
+
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+        return True
+
+    except SQLAlchemyError:
+        return False
