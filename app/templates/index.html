@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Weather Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1>Weather Dashboard</h1>
+            <p class="subtitle">
+                Wetterdaten und Prognosen
+            </p>
+        </div>
+    </header>
+
+    <main class="container dashboard">
+
+        <section class="search-section">
+            <h2 class="section-title">Standort auswählen</h2>
+
+            <form class="search-box" method="get" action="/">
+        <input
+            type="search"
+            id="location"
+            name="q"
+            value="{{ q or '' }}"
+            placeholder="Stadt suchen, z. B. Chur"
+            minlength="2"
+            maxlength="100"
+            required
+        >
+        <button type="submit">Suchen</button>
+    </form>
+
+    {% if error %}
+        <p role="alert">{{ error }}</p>
+    {% elif locations %}
+        <ul class="location-results">
+            {% for location in locations %}
+                <li>
+                    {{ location.name }},
+                    {{ location.country }}
+                    ({{ location.latitude }},
+                    {{ location.longitude }})
+                    <a href="/?latitude={{ location.latitude }}&amp;longitude={{ location.longitude }}">{{ location.name }}, {{ location.country }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif q and q|trim|length >= 2 %}
+        <p>Keine Standorte gefunden.</p>
+    {% endif %}
+        </section>
+
+        <section aria-labelledby="weather-title">
+            <h2 class="section-title" id="weather-title">
+                Aktuelles Wetter
+            </h2>
+
+            <div class="weather-grid">
+                <article class="card">
+                    <p class="card-label">Temperatur</p>
+                    <p class="card-value" id="temperature">-- °C</p>
+                    <p class="card-description">
+                        Aktuelle Temperatur
+                    </p>
+                </article>
+
+                <article class="card">
+                    <p class="card-label">Niederschlag</p>
+                    <p class="card-value" id="precipitation">-- mm</p>
+                    <p class="card-description">
+                        Aktueller Niederschlag
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <section class="card chart-card"
+                 aria-labelledby="forecast-title">
+            <h2 class="section-title" id="forecast-title">
+                7-Tage-Prognose
+            </h2>
+
+            <div class="chart-container" id="forecast-chart">
+                <div class="chart-placeholder">
+                    Hier erscheint später das
+                    Plotly-Temperaturdiagramm.
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script>
+        async function loadWeather() {
+            const latitude = {{ latitude | tojson }};
+            const longitude = {{ longitude | tojson }};
+
+            const url = `/api/weather?latitude=${latitude}&longitude=${longitude}`;
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP-Fehler: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                document.getElementById("temperature").textContent =
+                    `${data.current.temperature_celsius} °C`;
+
+                document.getElementById("precipitation").textContent =
+                    `${data.current.precipitation_mm} mm`;
+
+            } catch (error) {
+                console.error(error);
+
+                document.getElementById("temperature").textContent =
+                    "Nicht verfügbar";
+
+                document.getElementById("precipitation").textContent =
+                    "Nicht verfügbar";
+    }
+}
+
+async function loadForecast() {
+    const latitude = {{ latitude | tojson }};
+    const longitude = {{ longitude | tojson }};
+
+    const url = `/api/weather/forecast?latitude=${latitude}&longitude=${longitude}`;
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP-Fehler: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const dates = data.daily.map(day => day.date);
+
+        console.log("Datum:", dates);
+
+        const max = data.daily.map(day => day.temperature_max_celsius);
+        const min = data.daily.map(day => day.temperature_min_celsius);
+
+        console.log("Max:", max);
+        console.log("Min:", min);
+
+        const maxTrace = {
+            x: dates,
+            y: max,
+            type: "scatter",
+            mode: "lines+markers",
+            name: "Höchsttemperatur",
+            line: { color: "#F97316" }
+        };
+
+        const minTrace = {
+            x: dates,
+            y: min,
+            type: "scatter",
+            mode: "lines+markers",
+            name: "Tiefsttemperatur",
+            line: { color: "#2563EB" }
+        };
+
+    Plotly.newPlot(
+        "forecast-chart",
+        [maxTrace, minTrace],
+        {
+            xaxis: { title: "Datum" },
+            yaxis: { title: "Temperatur (°C)" }
+        },
+        { responsive: true }
+    );
+
+    } catch (error) {
+        console.error("Prognose konnte nicht geladen werden:", error);
+    }
+}
+
+loadWeather();
+loadForecast();
+    </script>
+</body>
+</html>
