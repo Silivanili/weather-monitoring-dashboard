@@ -1,0 +1,2 @@
+container_name = "weather-dashboard-terraform"
+host_port      = 18080

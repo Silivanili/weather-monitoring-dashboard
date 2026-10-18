@@ -14,3 +14,4 @@ tests
 !.env.example
 *.md
 weather_monitoring_dashboard.egg-info
+terraform/

@@ -33,6 +33,7 @@ The project combines weather data integration, a FastAPI backend, PostgreSQL per
 | Testing | pytest, pytest-cov |
 | Code quality | Ruff |
 | Version control | Git, GitHub |
+| Infrastructure as Code | Terraform, kreuzwerker/docker |
 
 ## Local Development
 
@@ -124,6 +125,37 @@ docker compose down
 ```
 
 PostgreSQL data is stored in a persistent Docker volume and is preserved when the containers are stopped or recreated. The Docker volume is not a substitute for a backup.
+
+## Infrastructure as Code (Terraform)
+
+The project includes a Terraform configuration using the `kreuzwerker/docker` provider.
+
+It manages a local Docker image reference and a FastAPI container, demonstrating declarative infrastructure provisioning, variable validation, outputs, state management, idempotency, and configuration drift detection.
+
+### Quick Start
+
+From the project root:
+
+```bash
+docker build -t weather-dashboard:terraform-local .
+cd terraform
+terraform init
+terraform validate
+terraform plan
+terraform apply
+```
+
+The dashboard is available at http://localhost:18080.
+
+To remove the Terraform-managed infrastructure:
+
+```bash
+terraform destroy
+```
+
+This deployment runs separately from the Docker Compose stack. It uses an in-memory SQLite database and is intended for local testing and demonstrating Infrastructure as Code, not for persistent production deployment.
+
+For configuration variables, outputs, verification results, and further details, see [Terraform Documentation](terraform/README.md).
 
 ## API Endpoints
 
