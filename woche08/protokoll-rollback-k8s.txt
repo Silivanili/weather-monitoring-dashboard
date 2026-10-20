@@ -1,0 +1,12 @@
+===== ROLLBACK START 2026-10-20T13:57:46+00:00 =====
+Warning: resource deployments/weather-web was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.
+error: unable to find specified revision 1 in history
+FEHLER: Rollback konnte nicht gestartet werden
+===== ROLLBACK PRUEFUNG 2026-10-20T13:57:46+00:00 =====
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+weather-web   3/3     3            3           19m
+NAME                           IMAGE                      READY
+weather-web-846fd57669-lbwkw   weather-dashboard:k8s-v1   true
+weather-web-846fd57669-pvcx8   weather-dashboard:k8s-v1   true
+weather-web-846fd57669-q7kgl   weather-dashboard:k8s-v1   true
+===== ROLLBACK ENDE 2026-10-20T13:57:46+00:00 =====
