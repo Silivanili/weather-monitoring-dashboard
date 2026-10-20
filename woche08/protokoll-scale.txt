@@ -1,0 +1,8 @@
+Skalierung: deklarativ, replicas: 3
+Zeitpunkt: 2026-10-20T14:03:08+00:00
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+weather-web   3/3     3            3           24m
+NAME                           READY   STATUS    RESTARTS   AGE     IP           NODE                        NOMINATED NODE   READINESS GATES
+weather-web-846fd57669-lbwkw   1/1     Running   0          8m17s   10.244.2.8   weather-dashboard-worker2   <none>           <none>
+weather-web-846fd57669-pvcx8   1/1     Running   0          8m30s   10.244.1.5   weather-dashboard-worker    <none>           <none>
+weather-web-846fd57669-q7kgl   1/1     Running   0          8m24s   10.244.2.7   weather-dashboard-worker2   <none>           <none>

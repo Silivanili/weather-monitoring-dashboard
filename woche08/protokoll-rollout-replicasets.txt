@@ -1,0 +1,3 @@
+NAME                     CREATED                IMAGE                      REPLICAS
+weather-web-6cb5bd4cdd   2026-10-20T13:43:52Z   weather-dashboard:k8s-v2   0
+weather-web-846fd57669   2026-10-20T13:38:09Z   weather-dashboard:k8s-v1   3
