@@ -65,8 +65,52 @@ jobs:
     name: Build image
     runs-on: ubuntu-latest
     needs: [lint, test]
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@v4
 
       - name: Build container image
         run: docker build -t weather-monitoring-dashboard:ci .
+
+      # The SARIF report is informational; the explicit gate below enforces policy.
+      - name: Trivy report (SARIF)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: weather-monitoring-dashboard:ci
+          scan-type: image
+          scanners: vuln
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "0"
+
+      - name: Save vulnerability report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-results-sarif
+          path: trivy-results.sarif
+          if-no-files-found: warn
+
+      # Main-branch runs publish results to GitHub Security.
+      # Fork pull requests still get the scan and artifact, without write-token access.
+      - name: Upload SARIF to GitHub Security
+        if: github.event_name != 'pull_request'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+
+      # Enforce the course security threshold: fail for fixable HIGH/CRITICAL CVEs.
+      - name: Trivy security gate (fixable HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: weather-monitoring-dashboard:ci
+          scan-type: image
+          scanners: vuln
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"

@@ -25,3 +25,6 @@ dist/
 
 # Allow a documented example environment file
 !.env.example
+
+# Trivy runtime scan output (summaries belong in MONITORING.md)
+docs/woche-09/trivy-results.json

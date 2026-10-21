@@ -1,0 +1,52 @@
+groups:
+  - name: weather-dashboard
+    rules:
+      # Standard alarm from week-09 lab, adapted to weather-dashboard job.
+      - alert: WeatherDashboardDown
+        expr: up{job="weather-dashboard"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Weather-Dashboard is unreachable"
+          description: "Prometheus cannot scrape {{ $labels.instance }} for more than one minute."
+          runbook: "docs/woche-09/alert-runbook.md#weatherdashboarddown"
+
+      # HTTP 5xx from application or provider, excluding expected 4xx validation errors.
+      - alert: WeatherHighErrorRate
+        expr: |
+          sum(rate(weather_http_requests_total{status=~"5.."}[5m]))
+          / clamp_min(sum(rate(weather_http_requests_total[5m])), 1e-9) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than 5% of requests end with 5xx"
+          description: "5xx proportion over the last five minutes is {{ $value | humanizePercentage }}."
+          runbook: "docs/woche-09/alert-runbook.md#weatherhigherrorrate"
+
+      - alert: WeatherHighLatencyP95
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(weather_http_request_duration_seconds_bucket[5m]))
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Weather-Dashboard p95 latency exceeds one second"
+          description: "The HTTP p95 latency has exceeded one second for five minutes."
+          runbook: "docs/woche-09/alert-runbook.md#weatherhighlatencyp95"
+
+      # Additional week-09 assignment rule, specific to this weather application.
+      # A stale fallback returns HTTP 200; 5xx metrics alone cannot detect it.
+      - alert: WeatherStaleCacheFallback
+        expr: increase(weather_stale_cache_responses_total[10m]) >= 3
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Weather API is serving stale cached observations"
+          description: "At least three stale fallback responses occurred in the last ten minutes. Verify the upstream weather provider."
+          runbook: "docs/woche-09/alert-runbook.md#weatherstalecachefallback"

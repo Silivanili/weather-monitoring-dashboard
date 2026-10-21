@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
+from app.metrics import WEATHER_STALE_CACHE_RESPONSES
 from app.schemas.weather import ForecastResponse, WeatherResponse
 from app.services.weather import (
     WeatherProviderError,
@@ -48,6 +49,7 @@ def get_weather(
 
     except WeatherProviderError as exc:
         if latest_observation is not None:
+            WEATHER_STALE_CACHE_RESPONSES.inc()
             return weather_observation_to_response(
                 latest_observation,
                 stale=True,

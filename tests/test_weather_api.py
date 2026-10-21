@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
+from prometheus_client import REGISTRY
 from sqlalchemy import delete
 
 from app.db.database import SessionLocal
@@ -159,6 +160,8 @@ def test_weather_uses_fresh_cache(monkeypatch):
 
 
 def test_weather_returns_stale_cache_when_provider_fails(monkeypatch):
+    before = REGISTRY.get_sample_value("weather_stale_cache_responses_total") or 0.0
+
     with SessionLocal() as db:
         save_weather_observation(
             make_weather_data(
@@ -191,6 +194,8 @@ def test_weather_returns_stale_cache_when_provider_fails(monkeypatch):
     assert data["current"]["temperature_celsius"] == 7.0
     assert data["meta"]["cached"] is True
     assert data["meta"]["stale"] is True
+    after = REGISTRY.get_sample_value("weather_stale_cache_responses_total")
+    assert after == before + 1
 
 
 def test_weather_returns_502_when_provider_fails_without_cache(
