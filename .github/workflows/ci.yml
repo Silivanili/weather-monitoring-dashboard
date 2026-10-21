@@ -76,7 +76,7 @@ jobs:
 
       # The SARIF report is informational; the explicit gate below enforces policy.
       - name: Trivy report (SARIF)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: weather-monitoring-dashboard:ci
           scan-type: image
@@ -105,7 +105,7 @@ jobs:
 
       # Enforce the course security threshold: fail for fixable HIGH/CRITICAL CVEs.
       - name: Trivy security gate (fixable HIGH/CRITICAL)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: weather-monitoring-dashboard:ci
           scan-type: image
