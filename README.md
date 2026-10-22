@@ -77,25 +77,39 @@ Docker Compose runs the FastAPI application and PostgreSQL in separate container
 - Docker Engine
 - Docker Compose v2
 
+
 ### Configuration
 
-Create a `.env` file in the project root with the following variables:
+Copy the example environment file:
 
-```dotenv
-POSTGRES_USER=weather_app
-POSTGRES_DB=weather_dashboard
-POSTGRES_PASSWORD=replace_with_a_secure_random_password
+```bash
+cp .env.example .env
 ```
 
-Generate a secure password, for example, using:
+Open `.env` and replace both password placeholders with
+different, secure passwords.
+
+Generate secure passwords, for example, using:
 
 ```bash
 openssl rand -hex 24
 ```
 
-Replace the placeholder with the generated password.
+The required environment variables are:
 
-**Never commit the `.env` file or database credentials to Git.**
+| Variable | Description |
+|---|---|
+| `POSTGRES_USER` | PostgreSQL username |
+| `POSTGRES_DB` | PostgreSQL database name |
+| `POSTGRES_PASSWORD` | PostgreSQL password |
+| `GRAFANA_ADMIN_PASSWORD` | Grafana administrator password |
+
+**Security:**
+- Never commit `.env` or real credentials to Git.
+- Use different passwords for PostgreSQL and Grafana.
+- `.env.example` contains placeholders only and is safe to commit.
+
+
 
 ### Start the Containers
 
