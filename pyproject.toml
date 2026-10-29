@@ -47,5 +47,6 @@ select = ["E", "F", "I"]
 [tool.setuptools.package-data]
 app = [
     "static/css/*.css",
+    "static/js/*.js",
     "templates/*.html",
 ]

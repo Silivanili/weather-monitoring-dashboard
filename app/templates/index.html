@@ -6,81 +6,220 @@
           content="width=device-width, initial-scale=1">
 
     <title>Weather Dashboard</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css?v=20261029-plotly-dark">
 </head>
 
 <body>
+    <!-- Wiederverwendbare 16-Bit-Wettericons: grobes Pixelraster, keine Emoji-Abhaengigkeit. -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"
+         aria-hidden="true" style="position:absolute;overflow:hidden">
+      <defs>
+        <symbol id="wx-sun" viewBox="0 0 64 64">
+          <g shape-rendering="crispEdges">
+            <g fill="#F5AE48"><path d="M28 3h8v12h-8zM28 49h8v12h-8zM3 28h12v8H3zM49 28h12v8H49zM10 10h8v8h-8zM46 10h8v8h-8zM10 46h8v8h-8zM46 46h8v8h-8z"/></g>
+            <path d="M24 16h16v6h6v20h-6v6H24v-6h-6V22h6z" fill="#F5AE48"/>
+            <path d="M25 20h14v5h5v14h-5v5H25v-5h-5V25h5z" fill="#FFDC74"/>
+            <path d="M25 22h12v4H25z" fill="#FFF1B0"/>
+          </g>
+        </symbol>
+        <symbol id="wx-cloud" viewBox="0 0 64 64">
+          <g shape-rendering="crispEdges">
+            <path d="M7 34h7V24h12v-8h18v7h8v8h6v21H7z" fill="#607A9E"/>
+            <path d="M5 38h10V28h12v-7h15v8h10v8h7v12H5z" fill="#BACDDE"/>
+            <path d="M14 30h13v-5h12v6h-7v5H14z" fill="#EEF5F9"/>
+            <path d="M7 49h50v5H7z" fill="#48658C"/>
+          </g>
+        </symbol>
+        <symbol id="wx-partly" viewBox="0 0 64 64">
+          <g shape-rendering="crispEdges">
+            <path d="M38 3h7v10h-7zM54 17h8v7h-8zM24 8h8v7h-8z" fill="#F3A947"/>
+            <path d="M32 15h16v5h5v17h-5v5H32v-5h-5V20h5z" fill="#F3A947"/>
+            <path d="M33 19h14v4h4v12h-4v4H33v-4h-4V23h4z" fill="#FFDB74"/>
+            <path d="M8 38h7V27h10v-6h12v6h7v7h8v6h4v13H8z" fill="#607A9E"/>
+            <path d="M6 41h9V31h10v-6h12v9h8v7h9v10H6z" fill="#B6CDE2"/>
+            <path d="M13 35h13v-5h9v4h-4v6H13z" fill="#EDF4F9"/>
+            <path d="M9 50h44v4H9z" fill="#567291"/>
+          </g>
+        </symbol>
+        <symbol id="wx-rain" viewBox="0 0 64 64">
+          <g shape-rendering="crispEdges">
+            <path d="M7 26h7V16h12V9h18v7h8v8h6v20H7z" fill="#5E799F"/>
+            <path d="M5 30h10V20h12v-7h15v8h10v7h7v13H5z" fill="#B4C9DB"/>
+            <path d="M14 22h13v-5h12v6h-7v5H14z" fill="#E6F0F7"/>
+            <path d="M7 40h50v5H7z" fill="#4B668D"/>
+            <g fill="#65C2E7"><path d="M13 48h6v10h-6zM29 48h6v13h-6zM46 48h6v10h-6z"/></g>
+          </g>
+        </symbol>
+        <symbol id="wx-snow" viewBox="0 0 64 64">
+          <g shape-rendering="crispEdges">
+            <path d="M7 26h7V16h12V9h18v7h8v8h6v20H7z" fill="#6681A4"/>
+            <path d="M5 30h10V20h12v-7h15v8h10v7h7v13H5z" fill="#C3D8E7"/>
+            <path d="M14 22h13v-5h12v6h-7v5H14z" fill="#EDF6FA"/>
+            <path d="M7 40h50v5H7z" fill="#637C9D"/>
+            <g fill="#EDF6FF"><path d="M12 49h4v11h-4zM9 52h10v4H9zM29 49h4v11h-4zM26 52h10v4H26zM46 49h4v11h-4zM43 52h10v4H43z"/></g>
+          </g>
+        </symbol>
+        <symbol id="wx-storm" viewBox="0 0 64 64">
+          <g shape-rendering="crispEdges">
+            <path d="M7 26h7V16h12V9h18v7h8v8h6v20H7z" fill="#51678D"/>
+            <path d="M5 30h10V20h12v-7h15v8h10v7h7v13H5z" fill="#9DB5D0"/>
+            <path d="M7 40h50v5H7z" fill="#3D5478"/>
+            <path d="M34 43H22l-6 12h12l-4 9 22-19H34z" fill="#FFDA65"/>
+          </g>
+        </symbol>
+        <symbol id="wx-fog" viewBox="0 0 64 64">
+          <g shape-rendering="crispEdges">
+            <path d="M9 12h46v5H9zM4 24h41v5H4zM17 36h43v5H17zM7 48h47v5H7z" fill="#AFC3D9"/>
+            <path d="M39 17h17v4H39zM5 41h19v4H5z" fill="#617C9C"/>
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+
     <header class="site-header">
-        <div class="container">
-            <h1>Weather Dashboard</h1>
-            <p class="subtitle">
-                Wetterdaten und Prognosen
-            </p>
+        <div class="container header-layout">
+            <div class="header-branding">
+                <h1>Weather Dashboard</h1>
+                <p class="subtitle">Wetterdaten und Prognosen</p>
+            </div>
+
+            <section class="search-section" aria-labelledby="location-search-title">
+                <h2 class="section-title" id="location-search-title">Standort auswählen</h2>
+
+                <!-- JavaScript: Vorschlaege beim Tippen. Ohne JavaScript: Enter/GET-Fallback. -->
+                <div class="location-picker">
+                    <form class="search-box" id="location-search-form" method="get" action="/" role="search">
+                        <input
+                            type="search"
+                            id="location"
+                            name="q"
+                            value="{{ q or '' }}"
+                            placeholder="Stadt suchen, z. B. Chur"
+                            minlength="2"
+                            maxlength="100"
+                            required
+                            autocomplete="off"
+                            role="combobox"
+                            aria-label="Ort suchen"
+                            aria-autocomplete="list"
+                            aria-haspopup="listbox"
+                            aria-expanded="{{ 'true' if locations else 'false' }}"
+                            aria-controls="location-results"
+                            aria-describedby="location-search-feedback"
+                        >
+                        <noscript><button type="submit">Suchen</button></noscript>
+                    </form>
+                    <ul class="location-results" id="location-results" role="listbox"
+                        aria-label="Standortvorschläge"{% if not locations %} hidden{% endif %}>
+                        {% for location in locations %}
+                        <li id="location-option-{{ loop.index0 }}" role="option" aria-selected="false">
+                            <a href="/?latitude={{ location.latitude }}&amp;longitude={{ location.longitude }}"
+                               data-latitude="{{ location.latitude }}"
+                               data-longitude="{{ location.longitude }}"
+                               data-location-name="{{ location.name }}"
+                               data-location-country="{{ location.country }}">{{ location.name }}, {{ location.country }}</a>
+                            <span class="location-result-coordinates">{{ location.latitude }}, {{ location.longitude }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <p id="location-search-feedback" class="search-feedback" role="status" aria-live="polite">{% if error %}{{ error }}{% elif q and not locations and q|trim|length >= 2 %}Keine Standorte gefunden.{% endif %}</p>
+            </section>
         </div>
     </header>
 
-    <main class="container dashboard">
+    <main class="container dashboard"
+          data-latitude="{{ latitude }}" data-longitude="{{ longitude }}"
+          data-location-name="{{ initial_location.name if initial_location else '' }}"
+          data-location-country="{{ initial_location.country if initial_location else '' }}">
 
-        <section class="search-section">
-            <h2 class="section-title">Standort auswählen</h2>
+        <!-- Gemeinsames 16-Bit-Panel fuer alle aktuellen Wetterdaten. -->
+        <section class="current-weather-section" aria-labelledby="weather-title">
+            <h2 class="section-title" id="weather-title">Aktuelles Wetter</h2>
 
-            <form class="search-box" method="get" action="/">
-        <input
-            type="search"
-            id="location"
-            name="q"
-            value="{{ q or '' }}"
-            placeholder="Stadt suchen, z. B. Chur"
-            minlength="2"
-            maxlength="100"
-            required
-        >
-        <button type="submit">Suchen</button>
-    </form>
+            <article class="card current-weather-panel" id="current-weather-panel"
+                     data-state="loading" aria-busy="true">
+                <div class="current-panel-bar">
+                    <span class="current-panel-label"><span aria-hidden="true">▣</span> WETTERMODUL / JETZT</span>
+                    <span class="current-status" id="weather-status" role="status" aria-live="polite">DATEN LADEN</span>
+                </div>
 
-    {% if error %}
-        <p role="alert">{{ error }}</p>
-    {% elif locations %}
-        <ul class="location-results">
-            {% for location in locations %}
-                <li>
-                    {{ location.name }},
-                    {{ location.country }}
-                    ({{ location.latitude }},
-                    {{ location.longitude }})
-                    <a href="/?latitude={{ location.latitude }}&amp;longitude={{ location.longitude }}">{{ location.name }}, {{ location.country }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% elif q and q|trim|length >= 2 %}
-        <p>Keine Standorte gefunden.</p>
-    {% endif %}
+                <div class="current-weather-content">
+                    <div class="current-temperature-block">
+                        <p class="current-kicker">LUFTTEMPERATUR</p>
+                        <div class="current-main-temperature">
+                            <span id="temperature" class="current-temp-number">--</span>
+                            <span class="current-temp-unit">°C</span>
+                        </div>
+                        <div class="current-location-box">
+                            <p class="current-location-heading">STANDORT</p>
+                            <p class="current-location-name" id="current-location">Standort wird geladen ...</p>
+                        </div>
+                    </div>
+
+                    <div class="current-condition-block">
+                        <div class="current-sky-screen" aria-hidden="true">
+                            <span class="sky-corner sky-corner-tl"></span>
+                            <span class="sky-corner sky-corner-tr"></span>
+                            <span class="sky-corner sky-corner-bl"></span>
+                            <span class="sky-corner sky-corner-br"></span>
+                            <svg class="current-weather-icon" viewBox="0 0 64 64">
+                                <use id="current-weather-icon" href="#wx-cloud"></use>
+                            </svg>
+                        </div>
+                        <p class="current-condition-label">WETTERZUSTAND</p>
+                        <p class="current-condition-name" id="weather-condition">Wird geladen ...</p>
+                    </div>
+
+                    <div class="current-details" aria-label="Weitere Wetterwerte">
+                        <div class="current-detail">
+                            <div class="current-detail-label">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" class="current-detail-icon">
+                                    <path fill="currentColor" d="M10 2h4v4h2v4h2v6h-2v4H8v-4H6v-6h2V6h2z"/>
+                                </svg>
+                                NIEDERSCHLAG
+                            </div>
+                            <p class="current-detail-value"><span id="precipitation">--</span> <span class="current-detail-unit">mm</span></p>
+                        </div>
+                        <div class="current-detail">
+                            <div class="current-detail-label">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" class="current-detail-icon">
+                                    <path fill="currentColor" d="M10 2h4v4h3v4h3v5h-3v4H7v-4H4v-5h3V6h3z"/>
+                                    <path fill="#17243E" d="M11 12h3v5h-3z"/>
+                                </svg>
+                                LUFTFEUCHTIGKEIT
+                            </div>
+                            <p class="current-detail-value"><span id="humidity">--</span> <span class="current-detail-unit">%</span></p>
+                        </div>
+                        <div class="current-detail">
+                            <div class="current-detail-label">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" class="current-detail-icon">
+                                    <path fill="currentColor" d="M3 5h13v3H3zM3 11h18v3H3zM3 17h11v3H3zM18 3h3v5h-3z"/>
+                                </svg>
+                                WINDGESCHWINDIGKEIT
+                            </div>
+                            <p class="current-detail-value"><span id="wind-speed">--</span> <span class="current-detail-unit">km/h</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="current-panel-footer">
+                    <span>QUELLE / <strong id="weather-source">--</strong></span>
+                    <span>MESSZEIT / <strong id="weather-time">--</strong></span>
+                </div>
+            </article>
         </section>
+        <section class="forecast-days-section"
+         aria-labelledby="forecast-days-title">
 
-        <section aria-labelledby="weather-title">
-            <h2 class="section-title" id="weather-title">
-                Aktuelles Wetter
-            </h2>
+    <h2 class="section-title" id="forecast-days-title">
+        7-Tage-Vorhersage
+    </h2>
 
-            <div class="weather-grid">
-                <article class="card">
-                    <p class="card-label">Temperatur</p>
-                    <p class="card-value" id="temperature">-- °C</p>
-                    <p class="card-description">
-                        Aktuelle Temperatur
-                    </p>
-                </article>
+    <p id="forecast-feedback" class="search-feedback" role="status" aria-live="polite"></p>
+    <div class="forecast-days-grid"></div>
 
-                <article class="card">
-                    <p class="card-label">Niederschlag</p>
-                    <p class="card-value" id="precipitation">-- mm</p>
-                    <p class="card-description">
-                        Aktueller Niederschlag
-                    </p>
-                </article>
-            </div>
-        </section>
-
+</section>
         <section class="card chart-card"
                  aria-labelledby="forecast-title">
             <h2 class="section-title" id="forecast-title">
@@ -96,100 +235,7 @@
         </section>
 
     </main>
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-    <script>
-        async function loadWeather() {
-            const latitude = {{ latitude | tojson }};
-            const longitude = {{ longitude | tojson }};
-
-            const url = `/api/weather?latitude=${latitude}&longitude=${longitude}`;
-
-            try {
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP-Fehler: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                document.getElementById("temperature").textContent =
-                    `${data.current.temperature_celsius} °C`;
-
-                document.getElementById("precipitation").textContent =
-                    `${data.current.precipitation_mm} mm`;
-
-            } catch (error) {
-                console.error(error);
-
-                document.getElementById("temperature").textContent =
-                    "Nicht verfügbar";
-
-                document.getElementById("precipitation").textContent =
-                    "Nicht verfügbar";
-    }
-}
-
-async function loadForecast() {
-    const latitude = {{ latitude | tojson }};
-    const longitude = {{ longitude | tojson }};
-
-    const url = `/api/weather/forecast?latitude=${latitude}&longitude=${longitude}`;
-
-    try {
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`HTTP-Fehler: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        const dates = data.daily.map(day => day.date);
-
-        console.log("Datum:", dates);
-
-        const max = data.daily.map(day => day.temperature_max_celsius);
-        const min = data.daily.map(day => day.temperature_min_celsius);
-
-        console.log("Max:", max);
-        console.log("Min:", min);
-
-        const maxTrace = {
-            x: dates,
-            y: max,
-            type: "scatter",
-            mode: "lines+markers",
-            name: "Höchsttemperatur",
-            line: { color: "#F97316" }
-        };
-
-        const minTrace = {
-            x: dates,
-            y: min,
-            type: "scatter",
-            mode: "lines+markers",
-            name: "Tiefsttemperatur",
-            line: { color: "#2563EB" }
-        };
-
-    Plotly.newPlot(
-        "forecast-chart",
-        [maxTrace, minTrace],
-        {
-            xaxis: { title: "Datum" },
-            yaxis: { title: "Temperatur (°C)" }
-        },
-        { responsive: true }
-    );
-
-    } catch (error) {
-        console.error("Prognose konnte nicht geladen werden:", error);
-    }
-}
-
-loadWeather();
-loadForecast();
-    </script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+    <script src="/static/js/dashboard.js?v=20261029-plotly-dark" defer></script>
 </body>
 </html>
