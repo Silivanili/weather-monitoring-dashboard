@@ -11,6 +11,7 @@ The project combines weather data integration, a FastAPI backend, PostgreSQL per
 - Web-based weather dashboard
 - Current weather data and forecasts from Open-Meteo
 - Location search and coordinate validation
+- Asynchronous location search and weather/forecast updates without page reload (vanilla JavaScript + Fetch API)
 - REST API built with FastAPI
 - PostgreSQL database integration
 - Docker Compose deployment
@@ -248,3 +249,22 @@ Implemented functionality includes weather data integration, forecasting, locati
 ## License
 
 See [LICENSE](LICENSE) for licensing information.
+
+## Location Search (Frontend)
+
+The location search uses autocomplete: after at least two characters and a 300 ms
+typing pause, the browser requests `GET /api/locations/search?q=...` using the
+Fetch API. A dropdown appears directly below the input; there is no visible
+search button when JavaScript is enabled. The first suggestion is selected by
+default. Use **↑/↓** to switch suggestions, **Enter** to select, or
+**Escape** to close them. A mouse or touch click also selects a suggestion.
+
+When a user chooses a result, the current weather (`/api/weather`) and the
+seven-day forecast (`/api/weather/forecast`) update independently without
+reloading the page. `history.pushState` keeps selected coordinates in the URL.
+Superseded search and weather requests are canceled using `AbortController`,
+and back/forward navigation reloads only the data.
+
+With JavaScript disabled, a **Suchen** button and the server-rendered
+`GET /` search results remain usable. Frontend logic lives in
+`app/static/js/dashboard.js`.
