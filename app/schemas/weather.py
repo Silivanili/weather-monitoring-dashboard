@@ -8,6 +8,11 @@ class Coordinates(BaseModel):
     longitude: float
 
 
+class LocationLabel(BaseModel):
+    name: str
+    country: str
+
+
 class CurrentWeather(BaseModel):
     time: datetime
     temperature_celsius: float
@@ -27,6 +32,7 @@ class WeatherMeta(BaseModel):
 
 class WeatherResponse(BaseModel):
     coordinates: Coordinates
+    location: LocationLabel | None = None
     current: CurrentWeather
     meta: WeatherMeta
 

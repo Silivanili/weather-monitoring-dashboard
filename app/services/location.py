@@ -7,30 +7,10 @@ class LocationProviderError(Exception):
     """Raised when the external geocoding provider cannot deliver data."""
 
 
-def search_locations(query: str) -> list[dict]:
-    params = {
-        "name": query,
-        "count": 5,
-        "language": "de",
-        "format": "json",
-    }
-
-    try:
-        response = httpx.get(
-            OPEN_METEO_GEOCODING_URL,
-            params=params,
-            timeout=5.0,
-        )
-        response.raise_for_status()
-        provider_data = response.json()
-
-    except (httpx.HTTPError, ValueError) as exc:
-        raise LocationProviderError("Location provider unavailable") from exc
-
+def _extract_locations(provider_data: dict) -> list[dict]:
     results = provider_data.get("results", [])
 
     locations = []
-
     for result in results:
         if not all(
             key in result
@@ -53,3 +33,26 @@ def search_locations(query: str) -> list[dict]:
         )
 
     return locations
+
+
+def search_locations(query: str) -> list[dict]:
+    params = {
+        "name": query,
+        "count": 5,
+        "language": "de",
+        "format": "json",
+    }
+
+    try:
+        response = httpx.get(
+            OPEN_METEO_GEOCODING_URL,
+            params=params,
+            timeout=5.0,
+        )
+        response.raise_for_status()
+        provider_data = response.json()
+
+    except (httpx.HTTPError, ValueError) as exc:
+        raise LocationProviderError("Location provider unavailable") from exc
+
+    return _extract_locations(provider_data)

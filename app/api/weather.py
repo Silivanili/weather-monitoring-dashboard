@@ -32,10 +32,7 @@ def get_weather(
     )
 
     if latest_observation is not None and is_weather_observation_fresh(latest_observation):
-        return weather_observation_to_response(
-            latest_observation,
-            stale=False,
-        )
+        return weather_observation_to_response(latest_observation, stale=False)
 
     try:
         weather_data = get_weather_data(latitude, longitude)
@@ -50,10 +47,7 @@ def get_weather(
     except WeatherProviderError as exc:
         if latest_observation is not None:
             WEATHER_STALE_CACHE_RESPONSES.inc()
-            return weather_observation_to_response(
-                latest_observation,
-                stale=True,
-            )
+            return weather_observation_to_response(latest_observation, stale=True)
 
         raise HTTPException(
             status_code=502,

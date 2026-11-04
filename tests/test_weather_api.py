@@ -117,7 +117,7 @@ def test_weather_returns_weather_data(monkeypatch):
         "latitude": 46.85,
         "longitude": 9.53,
     }
-
+    assert data["location"] is None  # Standortname kommt aus der Standortsuche.
     assert data["current"]["temperature_celsius"] == 14.2
     assert data["meta"]["source"] == "open-meteo"
     assert data["meta"]["cached"] is False
@@ -221,3 +221,19 @@ def test_weather_returns_502_when_provider_fails_without_cache(
     assert response.json() == {
         "detail": "Weather provider unavailable",
     }
+
+
+def test_weather_does_not_call_reverse_geocoding(monkeypatch):
+    monkeypatch.setattr(
+        "app.api.weather.get_weather_data",
+        lambda latitude, longitude: make_weather_data(latitude=latitude, longitude=longitude),
+    )
+
+    def forbidden_http_request(*args, **kwargs):
+        raise AssertionError("Wetter-API darf keine Geocoding-Abfrage machen")
+
+    monkeypatch.setattr("app.services.location.httpx.get", forbidden_http_request)
+
+    response = client.get("/api/weather", params={"latitude": 46.85, "longitude": 9.53})
+    assert response.status_code == 200
+    assert response.json()["location"] is None

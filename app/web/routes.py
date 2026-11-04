@@ -43,5 +43,11 @@ def index(
             "error": error,
             "latitude": latitude,
             "longitude": longitude,
+            # Nur fuer den fest definierten Ausgangsort ist der Name sicher bekannt.
+            "initial_location": (
+                {"name": "Chur", "country": "Schweiz"}
+                if latitude == DEFAULT_LATITUDE and longitude == DEFAULT_LONGITUDE
+                else None
+            ),
         },
     )
